@@ -1,38 +1,33 @@
-# backend.py
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import secrets, time
+import uvicorn
+from fastapi import FastAPI
+import threading
+import asyncio
+from telethon import TelegramClient, events
 
+# Telegram sozlamalari
+api_id = 27877995
+api_hash = "f69a4c454706d10fea9f0e99cc91b353"
+bot_token = "BU_YERGA_SENING_BOT_TOKENINGNI_QO'Y"
+
+# FastAPI ilova
 app = FastAPI()
-AGENTS = {}
-PENDING = {}
 
-class PairResponse(BaseModel):
-    token: str
+@app.get("/")
+def home():
+    return {"status": "✅ Bot ishlayapti Render’da!"}
 
-class Task(BaseModel):
-    type: str
-    params: dict
+# Telegram bot
+bot = TelegramClient('bot_session', api_id, api_hash).start(bot_token=bot_token)
 
-@app.post("/pair", response_model=PairResponse)
-def pair():
-    token = secrets.token_urlsafe(16)
-    AGENTS[token] = {'last_seen': time.time()}
-    PENDING[token] = []
-    return {"token": token}
+@bot.on(events.NewMessage(pattern='/start'))
+async def handler(event):
+    await event.respond("Salom 👋! Men Render’da 24/7 ishlayman 🚀")
 
-@app.get("/tasks/{token}")
-def get_tasks(token: str):
-    if token not in AGENTS:
-        raise HTTPException(status_code=404, detail="Token not found")
-    AGENTS[token]['last_seen'] = time.time()
-    tasks = PENDING.get(token, [])
-    PENDING[token] = []
-    return {"tasks": tasks}
+# Telethon fon ishga tushirish funksiyasi
+def run_bot():
+    print("🤖 Bot fon rejimda ishga tushdi...")
+    asyncio.run(bot.run_until_disconnected())
 
-@app.post("/task/{token}")
-def create_task(token: str, task: Task):
-    if token not in AGENTS:
-        raise HTTPException(status_code=404, detail="Token not found")
-    PENDING[token].append(task.dict())
-    return {"ok": True}
+if __name__ == "__main__":
+    threading.Thread(target=run_bot, daemon=True).start()
+    uvicorn.run(app, host="0.0.0.0", port=10000)
