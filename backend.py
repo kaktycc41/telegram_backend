@@ -8,21 +8,21 @@ from telethon import TelegramClient, events
 # Telegram sozlamalari
 api_id = 27877995
 api_hash = "f69a4c454706d10fea9f0e99cc91b353"
-bot_token = "BU_YERGA_SENING_BOT_TOKENINGNI_QO'Y"  # Tokenni bu yerga qo'y
+bot_token = "7590353937:AAFpDqPYb5HtWiVyQIDV1B8TLp8Abvc-L0E"  # Tokenni bu yerga qo'y
 
 # FastAPI ilovasi
 app = FastAPI()
 
 @app.get("/")
 def home():
-    return {"status": "✅ Telegram bot Render’da ishlayapti!"}
+    return {"status": "✅ Telegram bot ishlayapti!"}
 
 # Telegram botni ishga tushiramiz
 bot = TelegramClient("bot_session", api_id, api_hash)
 
 @bot.on(events.NewMessage(pattern="/start"))
 async def start(event):
-    await event.respond("👋 Salom! Men Render’da 24/7 ishlaydigan botman.")
+    await event.respond("👋 Salom! Men avto nik name qiluvchi botman.")
     raise events.StopPropagation
 
 async def run_bot():
